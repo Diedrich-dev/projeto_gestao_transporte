@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "vale_sim_projeto",
+            "program": "lib/Controller/main.dart",
+            "cwd": "vale_sim_projeto",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "vale_sim_projeto (profile mode)",
+            "cwd": "vale_sim_projeto",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "vale_sim_projeto (release mode)",
+            "cwd": "vale_sim_projeto",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
