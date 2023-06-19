@@ -1,35 +1,32 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:vale_sim_projeto/Model/transporte.dart';
 import 'package:vale_sim_projeto/Service/transporteService.dart';
 import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
-class Perfil extends StatelessWidget {
-  //Guarda o id do tranposrte selecionado
-  int id = 0;
-  //construir transporte
-  Perfil({
-    required this.id,
-  });
+class Perfil extends StatefulWidget {
+  final String email;
+  final int id;
+  const Perfil({super.key, required this.id, required this.email});
 
+  @override
+  _PerfilState createState() => _PerfilState();
+}
+
+class _PerfilState extends State<Perfil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: new BarraSuperior(),
-
-      drawer: new MenuDrawer(),
-
+      appBar: BarraSuperior(),
+      drawer: MenuDrawer(email: widget.email,),
       body: FutureBuilder<Transporte>(
-        future: TransporteService().pesquisarTransportePorId(id),
+        future: TransporteService().pesquisarTransportePorId(widget.id),
         builder: (BuildContext context, AsyncSnapshot<Transporte> transporte) {
           if (transporte.hasData) {
             return Container(
               padding: EdgeInsets.symmetric(horizontal: 25),
               child: Column(
                 children: [
-                  //Número de transporte
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -37,15 +34,12 @@ class Perfil extends StatelessWidget {
                         Icons.directions_bus,
                         size: 60,
                         color: Color.fromARGB(255, 220, 183, 0),
-                      )
+                      ),
                     ],
                   ),
-
                   SizedBox(
                     height: 25,
                   ),
-
-                  //Nome
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -60,8 +54,6 @@ class Perfil extends StatelessWidget {
                       ),
                     ],
                   ),
-
-                  //Linha
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -73,19 +65,15 @@ class Perfil extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   Container(
                     padding: EdgeInsets.only(top: 25, bottom: 25),
                     child: Divider(
                       height: 5,
                     ),
                   ),
-
-                  //Ações
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      //HOrarios
                       Column(
                         children: [
                           Icon(
@@ -102,7 +90,7 @@ class Perfil extends StatelessWidget {
                               color: Color.fromARGB(255, 220, 183, 0),
                               fontSize: 18,
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ],
@@ -111,19 +99,16 @@ class Perfil extends StatelessWidget {
               ),
             );
           } else if (transporte.hasError) {
-            // Se ocorrer um erro durante o carregamento do transporte, exiba uma mensagem de erro
             return Center(
               child: Text('Erro ao carregar o transporte.'),
             );
           } else {
-            // Caso contrário, exiba um widget de carregamento ou qualquer outro conteúdo padrão
             return Center(
               child: CircularProgressIndicator(),
             );
           }
         },
       ),
-      //Editar
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.create_outlined),
         onPressed: () {},

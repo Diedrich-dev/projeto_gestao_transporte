@@ -10,6 +10,8 @@ import 'package:vale_sim_projeto/View/recursos/menu.dart';
 import '../Model/transporte.dart';
 
 class CadastroUsuario extends StatefulWidget {
+  final String email;
+    const CadastroUsuario({Key? key, required this.email}) : super(key: key);
   @override
   State<StatefulWidget> createState() => new CadastroState();
 }
@@ -193,7 +195,7 @@ class CadastroState extends State<CadastroUsuario> {
 
     Future.delayed(Duration(milliseconds: 2500), () {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => Buscar()));
+          context, MaterialPageRoute(builder: (context) => Buscar(email: widget.email,)));
     });
   }
 

@@ -7,20 +7,27 @@ import 'package:vale_sim_projeto/View/recursos/menu.dart';
 import '../Model/transporte.dart';
 
 class Cadastro extends StatefulWidget {
+  final String email;
+  const Cadastro({Key? key, required this.email}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => new CadastroState();
 }
 
 class CadastroState extends State<Cadastro> {
   //Controladores dos campos de inputs
-
-  Transporte transporte = new Transporte();
+  TextEditingController nomeController = new TextEditingController();
+  TextEditingController placaController = new TextEditingController();
+  TextEditingController linhaController = new TextEditingController();
+  TextEditingController capacidadeController = new TextEditingController();
+  TextEditingController numeroController = new TextEditingController();
+  TextEditingController renavamController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new BarraSuperior(),
-      drawer: new MenuDrawer(),
+      drawer: new MenuDrawer(email: widget.email,),
       body: new SingleChildScrollView(
         //formulario
         child: Container(
@@ -45,7 +52,7 @@ class CadastroState extends State<Cadastro> {
                   "Cadastro de transporte",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color:  Color.fromARGB(255, 220, 183, 0),
+                    color: Color.fromARGB(255, 220, 183, 0),
                     fontSize: 24,
                   ),
                 ),
@@ -53,70 +60,64 @@ class CadastroState extends State<Cadastro> {
 
               //inputs
 
-              campoInput("nome", transporte.nome as TextEditingController),
-              campoInput("número", transporte.numero as TextEditingController),
-              campoInput("linha", transporte.linha as TextEditingController),
-              campoInput("placa", transporte.placa as TextEditingController),
-              campoInput("renavam", transporte.renavam as TextEditingController),
+              campoInput("motorista", nomeController),
+              campoInput("número", numeroController),
+              campoInput("linha", linhaController),
+              campoInput("placa", placaController),
+              campoInput("renavam", renavamController),
 
-              SizedBox(height: 15,),
-
+              SizedBox(
+                height: 15,
+              ),
               //botões
-
-              new Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   //Botão cadastrar
-                  new Builder(
-                    builder: (BuildContext context) {
-                      return ElevatedButton(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-
-                          child: Text(
-                            "Cadastrar",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
+                  Builder(builder: (BuildContext context) {
+                    return ElevatedButton(
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Text(
+                          "Cadastrar",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
                           ),
                         ),
-
-                        style: ElevatedButton.styleFrom(
-                          primary:  Color.fromARGB(255, 220, 183, 0),
-                        ),
-
-                        onPressed: (){
-                          cadastrar();
-                        },
-                        );
-                    }),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 220, 183, 0),
+                      ),
+                      onPressed: () {
+                        cadastrar();
+                      },
+                    );
+                  }),
 
                   //botão limpar
-                  new Builder(
-                    builder: (BuildContext context) {
-                      return ElevatedButton(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-
-                          child: Text(
-                            "Limpar",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color:  Color.fromARGB(255, 220, 183, 0),
-                            ),
+                  new Builder(builder: (BuildContext context) {
+                    return ElevatedButton(
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Text(
+                          "Limpar",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Color.fromARGB(255, 220, 183, 0),
                           ),
                         ),
-
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.white,
-                        ),
-
-                        onPressed: (){
-                          limpar();
-                        },
-                        );
-                    }),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.white,
+                      ),
+                      onPressed: () {
+                        limpar();
+                      },
+                    );
+                  }),
                 ],
               )
             ],
@@ -133,66 +134,88 @@ class CadastroState extends State<Cadastro> {
       margin: EdgeInsets.only(bottom: 10),
       child: TextField(
         style: TextStyle(
-          color:  Color.fromARGB(255, 220, 183, 0),
+          color: Color.fromARGB(255, 220, 183, 0),
         ),
         //controller
         controller: textEditingController,
         decoration: InputDecoration(
-          labelText: nomeCampo,
-          labelStyle: TextStyle(
-            color:  Color.fromARGB(255, 220, 183, 0),
-            fontSize: 18,
-          ),
-          border: OutlineInputBorder(
-              borderSide: BorderSide(
-            color:  Color.fromARGB(255, 220, 183, 0),
-          )),
-          focusedBorder:
-              OutlineInputBorder(borderSide: BorderSide(color:  Color.fromARGB(255, 220, 183, 0)))
-        ),
+            labelText: nomeCampo,
+            labelStyle: TextStyle(
+              color: Color.fromARGB(255, 220, 183, 0),
+              fontSize: 18,
+            ),
+            border: OutlineInputBorder(
+                borderSide: BorderSide(
+              color: Color.fromARGB(255, 220, 183, 0),
+            )),
+            focusedBorder: OutlineInputBorder(
+                borderSide:
+                    BorderSide(color: Color.fromARGB(255, 220, 183, 0)))),
       ),
     );
   }
-  //cadastrar
-  void cadastrar(){
-    TransporteService transporteService = TransporteService();
 
-    transporteService.create(transporte);
-    //mostra a mensagem com SnackBar (desaparece)
+  //cadastrar
+void cadastrar() async {
+  TransporteService transporteService = TransporteService();
+  Transporte transporte = Transporte();
+  transporte.nome = nomeController.text;
+  transporte.numero = numeroController.text;
+  transporte.linha = linhaController.text;
+  transporte.capacidade = capacidadeController.text;
+  transporte.placa = placaController.text;
+  transporte.renavam = renavamController.text;
+
+  bool sucesso = await transporteService.create(transporte);
+
+  if (sucesso) {
     ScaffoldMessenger.of(context).showSnackBar(
       new SnackBar(
-        content: Text('mensagem',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color:  Color.fromARGB(255, 220, 183, 0),
-        ),),
-        duration: Duration(
-          milliseconds: 2000,
+        content: Text(
+          'Transporte salvo com sucesso!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color.fromARGB(255, 220, 183, 0),
+          ),
         ),
+        duration: Duration(milliseconds: 2000),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.indigo.shade900,),
+        backgroundColor: Colors.indigo.shade900,
+      ),
     );
 
-    //redirecionar para a tela de busca
-
-    Future.delayed(
-      Duration(milliseconds: 2500),
-      () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Buscar())
-        );
-      }
+    Future.delayed(Duration(milliseconds: 2500), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Buscar(email: widget.email,)),
+      );
+    });
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      new SnackBar(
+        content: Text(
+          'Problemas ao salvar o transporte!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color.fromARGB(255, 220, 183, 0),
+          ),
+        ),
+        duration: Duration(milliseconds: 2000),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.indigo.shade900,
+      ),
     );
   }
+}
+
 
   //limpar campos
-  void limpar(){
-    this.transporte.nome = "";
-    this.transporte.numero = "";
-    this.transporte.renavam = "";
-    this.transporte.placa = "";
-    this.transporte.linha = "";
+  void limpar() {
+    nomeController.text = "";
+    numeroController.text = "";
+    renavamController.text = "";
+    placaController.text = "";
+    linhaController.text = "";
+    capacidadeController.text = "";
   }
 }

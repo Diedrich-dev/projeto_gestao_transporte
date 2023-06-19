@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:vale_sim_projeto/Model/usuario.dart';
+import 'package:vale_sim_projeto/Service/usuarioService.dart';
 import 'package:vale_sim_projeto/View/PerfilUsuario.dart';
 import 'package:vale_sim_projeto/View/cadastro.dart';
 import 'package:vale_sim_projeto/View/login.dart';
@@ -6,13 +8,16 @@ import 'package:vale_sim_projeto/View/login.dart';
 import '../buscar.dart';
 import '../home.dart';
 
-class MenuDrawer extends StatelessWidget {
-  //Dados do banco de dados simulados
-  String usuario = "Pedro";
-  String email = "pedrodiedrich123@gmail.com";
-  String fotoPerfil = "img/foto.jpg";
+class MenuDrawer extends StatefulWidget {
+  final String email;
+  const MenuDrawer({Key? key, required this.email}) : super(key: key);
 
-  Text mostrarTitulo (String titulo){
+  @override
+  _MenuDrawerState createState() => _MenuDrawerState();
+}
+
+class _MenuDrawerState extends State<MenuDrawer> {
+  Text mostrarTitulo(String titulo) {
     return Text(
       titulo,
       style: TextStyle(
@@ -21,64 +26,60 @@ class MenuDrawer extends StatelessWidget {
     );
   }
 
-  Icon formatarIconDrawer (IconData icon){
+  Icon formatarIconDrawer(IconData icon) {
     return Icon(
       icon,
       color: Color.fromARGB(255, 220, 183, 0),
       size: 32,
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         children: [
-          new UserAccountsDrawerHeader(
+          UserAccountsDrawerHeader(
             decoration: BoxDecoration(
               color: Colors.indigo.shade900,
             ),
-            accountName: Text(usuario),
-            accountEmail: Text(email),
+            accountName: Text("faw"),
+            accountEmail: Text(widget.email),
             currentAccountPicture: CircleAvatar(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
-                child: Image.asset(fotoPerfil),
-              ) 
+                // child: Image.asset(fotoPerfil),
+              ),
             ),
           ),
 
-          //home 
-          new ListTile(
+          ListTile(
             title: mostrarTitulo("Principal"),
             subtitle: Text("Página inicial"),
             trailing: Icon(Icons.arrow_right),
             leading: formatarIconDrawer(Icons.home),
-            onTap: (){
+            onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => Home())
-                );
+                MaterialPageRoute(builder: (context) => Home(email: widget.email)),
+              );
             },
           ),
 
-          //Perfil 
-          new ListTile(
+          ListTile(
             title: mostrarTitulo("Perfil"),
             subtitle: Text("Editar informações"),
             trailing: Icon(Icons.arrow_right),
             leading: formatarIconDrawer(Icons.people),
-            onTap: (){
+            onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => PerfilUsuario())
-                );
+                MaterialPageRoute(builder: (context) => PerfilUsuario(email: widget.email)),
+              );
             },
           ),
 
-          //favoritos
-          new ListTile(
+          ListTile(
             title: mostrarTitulo("Favoritos"),
             subtitle: Text("Meus transportes favoritos"),
             trailing: Icon(Icons.arrow_right),
@@ -86,46 +87,42 @@ class MenuDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => Buscar())
+                MaterialPageRoute(builder: (context) => Buscar(email: widget.email)),
               );
-            }
+            },
           ),
 
-          //mapa
-
-          //cadastro de onibus
-          new ListTile(
+          ListTile(
             title: mostrarTitulo("Cadastrar Transporte"),
             subtitle: Text("Cadastro de transportes"),
             trailing: Icon(Icons.arrow_right),
-            leading: 
-            formatarIconDrawer(Icons.construction),
+            leading: formatarIconDrawer(Icons.construction),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => Cadastro()));
-            }
+                MaterialPageRoute(builder: (context) => Cadastro(email: widget.email)),
+              );
+            },
           ),
 
-        //Sair do sistema 
-          new ListTile(
+          ListTile(
             title: mostrarTitulo("Sair"),
             subtitle: Text("Sair do sistema"),
             trailing: Icon(Icons.arrow_right),
-            leading: 
-            formatarIconDrawer(Icons.exit_to_app),
+            leading: formatarIconDrawer(Icons.exit_to_app),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => Scaffold(body: Login())));
-            }
+                MaterialPageRoute(builder: (context) => Scaffold(body: Login())),
+              );
+            },
           ),
-        ],     
+        ],
       ),
     );
   }
 
+  Future<String> getNome(email) async {
+    return Future.value(UsuarioService().getPerfilLogado(email));
+  }
 }

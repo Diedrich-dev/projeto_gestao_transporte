@@ -10,6 +10,9 @@ import '../Model/transporte.dart';
 import 'cadastro.dart';
 
 class Buscar extends StatefulWidget {
+  final String email;
+  const Buscar({Key? key, required this.email}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => new BuscarState();
 }
@@ -20,14 +23,24 @@ class BuscarState extends State<Buscar> {
     return Scaffold(
       appBar: new BarraSuperior(),
 
-      drawer: new MenuDrawer(),
+      drawer: new MenuDrawer(email: widget.email,),
 
       body: FutureBuilder<List<Transporte>>(
         future: TransporteService().getAllTransporte(),
         builder:
             (BuildContext context, AsyncSnapshot<List<Transporte>> snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Caso esteja aguardando a conclusão do Future, exiba um indicador de progresso
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            // Caso ocorra um erro ao obter os dados do Future, exiba uma mensagem de erro
+            return Center(child: Text('Ocorreu um erro ao carregar os dados'));
+          } else if (!snapshot.hasData || snapshot.data?.isEmpty == true) {
+            // Caso não haja dados disponíveis ou a lista esteja vazia, exiba uma mensagem informando
+            return Center(child: Text('Nenhum transporte encontrado'));
+          } else {
             return ListView.builder(
+              key: UniqueKey(),
               padding: EdgeInsets.fromLTRB(8, 8, 8, 75),
               itemCount: snapshot.data?.length,
               itemBuilder: (BuildContext context, int index) {
@@ -54,7 +67,7 @@ class BuscarState extends State<Buscar> {
                         Column(
                           children: [
                             Text(
-                              transporte.nome as String,
+                              'Motorista: ${transporte.nome as String}',
                               style: TextStyle(
                                   color: Color.fromARGB(255, 220, 183, 0),
                                   fontSize: 24),
@@ -63,7 +76,7 @@ class BuscarState extends State<Buscar> {
                               height: 10,
                             ),
                             new Text(
-                              transporte.linha as String,
+                              'linha: ${transporte.linha as String}',
                               style: TextStyle(
                                 color: Color.fromARGB(255, 220, 183, 0),
                               ),
@@ -86,15 +99,13 @@ class BuscarState extends State<Buscar> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Perfil(id: transporte.id as int)));
+                                    Perfil(id: transporte.id as int, email: widget.email)));
                       },
                     ),
                   ),
                 );
               },
             );
-          } else {
-            return Center(child: CircularProgressIndicator());
           }
         },
       ),
@@ -109,7 +120,7 @@ class BuscarState extends State<Buscar> {
         onPressed: () {
           //Botão adicionar
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => new Cadastro()));
+              context, MaterialPageRoute(builder: (context) => new Cadastro(email: widget.email)));
         },
       ),
     );

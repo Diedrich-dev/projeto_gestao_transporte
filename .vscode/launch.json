@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "vale_sim_projeto",
-            "program": "lib/Controller/main.dart",
+            "program": "lib/main.dart",
             "cwd": "vale_sim_projeto",
             "request": "launch",
             "type": "dart"

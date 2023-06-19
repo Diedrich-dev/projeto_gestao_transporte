@@ -6,17 +6,18 @@ import '../Model/transporte.dart';
 import 'conexao.dart';
 
 class TransporteService {
+  late Database db;
 
   Future<bool> create(Transporte transporte) async {
     try {
-      final Database db = await Conexao.getConexaoDB();
+      db = await Conexao.instance.getConexaoDB;
       transporte.id = await db.rawInsert(''' insert into
       $TRANSPORTE_TABLE_NAME(
         $TRANSPORTE_COLUMN_NOME,
         $TRANSPORTE_COLUMN_RENAVAM,
         $TRANSPORTE_COLUMN_PLACA,
         $TRANSPORTE_COLUMN_CAPACIDADE,
-        $TRANSPORTE_COLUMN_LINHA
+        $TRANSPORTE_COLUMN_LINHA)
         values(
           '${transporte.nome}', '${transporte.renavam}', '${transporte.placa}', '${transporte.capacidade}', '${transporte.linha}'
         )''');
@@ -28,19 +29,19 @@ class TransporteService {
   }
 
   Future<List<Map<String, dynamic>>> queryAllRows() async {
-    Database db = await Conexao.getConexaoDB();
+    db = await Conexao.instance.getConexaoDB;
     return await db.query(TRANSPORTE_TABLE_NAME);
   }
 
   Future<List<Transporte>> getAllTransporte() async {
-    Database db = await Conexao.getConexaoDB();
+    db = await Conexao.instance.getConexaoDB;
     List<Map> dbResult =
         await db.rawQuery('SELECT * FROM $TRANSPORTE_TABLE_NAME');
 
     List<Transporte> transportes = [];
     for (var row in dbResult) {
       Transporte transporte = Transporte();
-      transporte.id = row['id_Transporte'];
+      transporte.id = row['id_transporte'];
       transporte.nome = row['nome'];
       transporte.renavam = row['renavam'];
       transporte.placa = row['placa'];
@@ -52,7 +53,7 @@ class TransporteService {
   }
 
   Future<void> atualizarTransporte(Transporte transporte) async {
-    Database db = await Conexao.getConexaoDB();
+    db = await Conexao.instance.getConexaoDB;
     await db.transaction((txn) async {
       await txn.rawUpdate(
           'update $TRANSPORTE_TABLE_NAME set $TRANSPORTE_COLUMN_NOME = ?, $TRANSPORTE_COLUMN_RENAVAM = ?, $TRANSPORTE_COLUMN_PLACA = ?,  $TRANSPORTE_COLUMN_CAPACIDADE = ?, $TRANSPORTE_COLUMN_LINHA = ?, where id = ?',
@@ -67,7 +68,7 @@ class TransporteService {
   }
 
   Future<void> deleteTransportes(Transporte transporte) async {
-    Database db = await Conexao.getConexaoDB();
+    db = await Conexao.instance.getConexaoDB;
     await db.transaction((txn) async {
       await txn.rawUpdate(
           'DELETE FROM $TRANSPORTE_TABLE_NAME WHERE id = ?', [transporte.id]);
@@ -76,13 +77,13 @@ class TransporteService {
 
   Future<List<Transporte>> pesquisarTransporte(String filtro) async {
     List<Transporte> transportes = [];
-    Database db = await Conexao.getConexaoDB();
+    db = await Conexao.instance.getConexaoDB;
     List<Map> dbResult = await db.rawQuery(
         'SELECT * FROM $TRANSPORTE_TABLE_NAME WHERE $TRANSPORTE_COLUMN_NOME LIKE ?',
         ['%$filtro%']);
     for (var row in dbResult) {
       Transporte transporte = Transporte();
-      transporte.id = row['id_Transporte'];
+      transporte.id = row['id_transporte'];
       transporte.nome = row['nome'];
       transporte.renavam = row['renavam'];
       transporte.placa = row['placa'];
@@ -95,7 +96,7 @@ class TransporteService {
   }
 
   Future<Transporte> pesquisarTransportePorId(int id) async {
-    Database db = await Conexao.getConexaoDB();
+    db = await Conexao.instance.getConexaoDB;
     List<Map> dbResult = await db.rawQuery(
         'SELECT * FROM $TRANSPORTE_TABLE_NAME WHERE $TRANSPORTE_COLUMN_ID = ?',
         [id] // Utilize o parâmetro "id" fornecido na consulta
@@ -105,7 +106,7 @@ class TransporteService {
       Map row = dbResult.first;
 
       Transporte transporte = Transporte();
-      transporte.id = row['id_Transporte'];
+      transporte.id = row['id_transporte'];
       transporte.nome = row['nome'];
       transporte.renavam = row['renavam'];
       transporte.placa = row['placa'];

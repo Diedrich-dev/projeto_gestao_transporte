@@ -5,8 +5,11 @@ import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
 class Home extends StatefulWidget {
+  final String email;
+    const Home({Key? key, required this.email}) : super(key: key);
+
   @override
-  State<StatefulWidget> createState() => new HomeState();
+  State<StatefulWidget> createState() => HomeState();
 }
 
 class HomeState extends State<Home> {
@@ -14,22 +17,22 @@ class HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       //Titulo
-      appBar: new BarraSuperior(),
+      appBar: BarraSuperior(),
 
       // Menu Lateral
-      drawer: new MenuDrawer(),
+      drawer: MenuDrawer(email: widget.email),
 
       //Corpo
       body: SingleChildScrollView(
         child: Column(
           children: [
-            new Container(
+            Container(
               alignment: Alignment.center,
               padding: EdgeInsets.all(25),
               child: Column(
                 children: [
                   //Botão buscar transportes
-                  new Builder(builder: (BuildContext context) {
+                  Builder(builder: (BuildContext context) {
                     return ElevatedButton(
                         child: Container(
                             width: 300,
@@ -52,7 +55,7 @@ class HomeState extends State<Home> {
                         style: ElevatedButton.styleFrom(primary:  Color.fromARGB(255, 220, 183, 0)),
                         onPressed: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => new Buscar()));
+                              MaterialPageRoute(builder: (context) => Buscar(email: widget.email)));
                         });
                   }),
 
@@ -84,7 +87,7 @@ class HomeState extends State<Home> {
                         style: ElevatedButton.styleFrom(primary: Color.fromARGB(255, 220, 183, 0) ),
                         onPressed: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => new Cadastro()));
+                              MaterialPageRoute(builder: (context) => new Cadastro(email: widget.email,)));
                         });
                   }),
                 ],
