@@ -6,15 +6,15 @@ import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
 import '../Model/transporte.dart';
 
-class Cadastro extends StatefulWidget {
+class CadastroTransporte extends StatefulWidget {
   final String email;
-  const Cadastro({Key? key, required this.email}) : super(key: key);
+  const CadastroTransporte({Key? key, required this.email}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => new CadastroState();
+  State<StatefulWidget> createState() => new CadastroTransporteState();
 }
 
-class CadastroState extends State<Cadastro> {
+class CadastroTransporteState extends State<CadastroTransporte> {
   //Controladores dos campos de inputs
   TextEditingController nomeController = new TextEditingController();
   TextEditingController placaController = new TextEditingController();

@@ -1,6 +1,8 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:vale_sim_projeto/Model/transporte.dart';
 import 'package:vale_sim_projeto/Service/data_components.dart';
+import 'package:vale_sim_projeto/Service/favoritoService.dart';
 
 import '../Model/usuario.dart';
 import 'conexao.dart';
@@ -49,12 +51,24 @@ class UsuarioService {
     return usuarios;
   }
 
+  // Future<void> atualizarUsuario(Usuario usuario) async {
+  //   db = await Conexao.instance.getConexaoDB;
+  //   await db.transaction((txn) async {
+  //     await txn.rawUpdate(
+  //         'update $USUARIO_TABLE_NAME set $USUARIO_COLUMN_NOME = ?, $USUARIO_COLUMN_SOBRENOME = ?, $USUARIO_COLUMN_EMAIL = ?, $USUARIO_COLUMN_SENHA = ?, where id = ?',
+  //         [usuario.nome, usuario.sobrenome, usuario.email, usuario.senha]);
+  //   });
+  // }
+
   Future<void> atualizarUsuario(Usuario usuario) async {
     db = await Conexao.instance.getConexaoDB;
     await db.transaction((txn) async {
-      await txn.rawUpdate(
-          'update $USUARIO_TABLE_NAME set $USUARIO_COLUMN_NOME = ?, $USUARIO_COLUMN_SOBRENOME = ?, $USUARIO_COLUMN_EMAIL = ?, $USUARIO_COLUMN_SENHA = ?, where id = ?',
-          [usuario.nome, usuario.sobrenome, usuario.email, usuario.senha]);
+      await txn.update(
+        USUARIO_TABLE_NAME,
+        usuario.toMap(),
+        where: '$USUARIO_COLUMN_ID = ?',
+        whereArgs: [usuario.id],
+      );
     });
   }
 
@@ -111,31 +125,25 @@ class UsuarioService {
 
   Future<Usuario> getUsuarioLogado(String email) async {
     db = await Conexao.instance.getConexaoDB;
-    Usuario usuario = Usuario();
-    List<Map> dbResult = await db.rawQuery(
-      'SELECT * from $USUARIO_TABLE_NAME where $USUARIO_COLUMN_EMAIL = ?',
-      [email],
-    );
+    final usuarioResult = await db.query('usuario', where: 'email = ?', whereArgs: [email]);
 
-    for (var row in dbResult) {
-      usuario.id = row['id_usuario'];
-      usuario.nome = row['nome'];
-      usuario.sobrenome = row['sobrenome'];
-      usuario.senha = row['senha'];
-      usuario.email = row['email'];
+    if (usuarioResult.isNotEmpty) {
+      final usuario = Usuario.fromMap(usuarioResult.first);
 
-      // Consultar os transportes favoritos do usuário
-      List<Map> dbTransportesFavoritosResult = await db.rawQuery(
-        'SELECT * FROM $TRANSPORTE_TABLE_NAME '
-            'WHERE $TRANSPORTE_COLUMN_ID IN '
-            '(SELECT $FAVORITO_COLUMN_TRANSPORTE_ID FROM $FAVORITO_TABLE_NAME '
-            'WHERE $FAVORITO_COLUMN_USUARIO_ID = ?)',
-        [usuario.id],
-      );
+      if (usuario.id != null) {
+        // Busca os transportes favoritos do usuário
+        List<Transporte> dbTransportesFavoritosResult = await FavoritoService().getTransportesFavoritos(usuario.id as int);
 
-      usuario.transportesFavoritos = dbTransportesFavoritosResult.map((row) => Transporte.fromMap(row)).toList();
+        // Converte os resultados em objetos Transporte e atribui ao usuário
+        usuario.transportesFavoritos =
+            dbTransportesFavoritosResult.map((row) => Transporte.fromMap(row as Map<String, dynamic>)).toList();
+      }
+      return usuario;
+    } else {
+      throw Exception('Usuário não encontrado');
     }
-
-    return usuario;
   }
+
+
+
 }

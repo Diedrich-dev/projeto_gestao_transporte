@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:vale_sim_projeto/Model/transporte.dart';
 import 'package:vale_sim_projeto/Model/usuario.dart';
-import 'package:vale_sim_projeto/Service/transporteService.dart';
+import 'package:vale_sim_projeto/Service/favoritoService.dart';
 import 'package:vale_sim_projeto/Service/usuarioService.dart';
+import 'package:vale_sim_projeto/View/editarUsuario.dart';
 import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
@@ -16,12 +17,20 @@ class PerfilUsuario extends StatefulWidget {
 }
 
 class _PerfilUsuarioState extends State<PerfilUsuario> {
-  late Future<Usuario> usuario;
+  late Usuario usuario;
 
   @override
   void initState() {
     super.initState();
-    usuario = UsuarioService().getUsuarioLogado(widget.email);
+    carregarUsuario().then((loadedUsuario) {
+      setState(() {
+        usuario = loadedUsuario;
+      });
+    });
+  }
+
+  Future<Usuario> carregarUsuario() async {
+    return await UsuarioService().getUsuarioLogado(widget.email);
   }
 
   @override
@@ -30,7 +39,7 @@ class _PerfilUsuarioState extends State<PerfilUsuario> {
       appBar: BarraSuperior(),
       drawer: MenuDrawer(email: widget.email),
       body: FutureBuilder<Usuario>(
-        future: usuario,
+        future: UsuarioService().getUsuarioLogado(widget.email),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -90,29 +99,57 @@ class _PerfilUsuarioState extends State<PerfilUsuario> {
                       height: 5,
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.phone,
-                            color: Color.fromARGB(255, 220, 183, 0),
-                            size: 28,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            "Ligar",
-                            style: TextStyle(
-                              color: Colors.indigo.shade900,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  SizedBox(height: 25),
+                  Text(
+                    'Transportes Favoritos',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Expanded(
+                    child: FutureBuilder<List<Transporte>>(
+                      future: FavoritoService().getTransportesFavoritos(usuario.id as int),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Ocorreu um erro ao carregar os transportes favoritos'));
+                        } else {
+                          List<Transporte> transportesFavoritos = snapshot.data!;
+                          if (transportesFavoritos.isEmpty) {
+                            return Center(child: Text('Nenhum transporte favorito encontrado'));
+                          } else {
+                            return ListView.builder(
+                              itemCount: transportesFavoritos.length,
+                              itemBuilder: (context, index) {
+                                Transporte transporte = transportesFavoritos[index];
+                                return ListTile(
+                                  title: Text(transporte.nome!),
+                                  subtitle: Text(transporte.linha!),
+                                  trailing: IconButton(
+                                    icon: Icon(
+                                      transporte.favorito ? Icons.favorite : Icons.favorite_border,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        transporte.favorito = !transporte.favorito;
+                                      });
+                                      if (transporte.favorito) {
+                                        FavoritoService().adicionarFavorito(usuario, transporte);
+                                      } else {
+                                        FavoritoService().removerFavorito(usuario.id as int, transporte.id as int);
+                                      }
+                                    },
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        }
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -122,7 +159,12 @@ class _PerfilUsuarioState extends State<PerfilUsuario> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.create_outlined),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EditarUsuario(usuario: usuario)),
+          );
+        },
       ),
     );
   }

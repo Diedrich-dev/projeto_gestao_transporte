@@ -99,7 +99,7 @@ class TransporteService {
     db = await Conexao.instance.getConexaoDB;
     List<Map> dbResult = await db.rawQuery(
         'SELECT * FROM $TRANSPORTE_TABLE_NAME WHERE $TRANSPORTE_COLUMN_ID = ?',
-        [id] // Utilize o parâmetro "id" fornecido na consulta
+        [id]
         );
 
     if (dbResult.isNotEmpty) {

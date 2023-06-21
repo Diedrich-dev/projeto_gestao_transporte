@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vale_sim_projeto/View/buscar.dart';
-import 'package:vale_sim_projeto/View/cadastro.dart';
+import 'package:vale_sim_projeto/View/cadastroTransporte.dart';
 import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
@@ -87,7 +87,7 @@ class HomeState extends State<Home> {
                         style: ElevatedButton.styleFrom(primary: Color.fromARGB(255, 220, 183, 0) ),
                         onPressed: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => new Cadastro(email: widget.email,)));
+                              MaterialPageRoute(builder: (context) => new CadastroTransporte(email: widget.email,)));
                         });
                   }),
                 ],

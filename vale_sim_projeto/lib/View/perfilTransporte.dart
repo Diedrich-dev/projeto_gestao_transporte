@@ -1,26 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:vale_sim_projeto/Model/transporte.dart';
+import 'package:vale_sim_projeto/Service/favoritoService.dart';
 import 'package:vale_sim_projeto/Service/transporteService.dart';
 import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
-class Perfil extends StatefulWidget {
-  final String email;
-  final int id;
-  const Perfil({super.key, required this.id, required this.email});
+import '../Model/usuario.dart';
+
+class PerfilTransporte extends StatefulWidget {
+  final Usuario usuario;
+  final Transporte transporte;
+
+  const PerfilTransporte({Key? key, required this.usuario, required this.transporte}) : super(key: key);
 
   @override
-  _PerfilState createState() => _PerfilState();
+  _PerfilTransporteState createState() => _PerfilTransporteState();
 }
 
-class _PerfilState extends State<Perfil> {
+class _PerfilTransporteState extends State<PerfilTransporte> {
+  bool _isFavorito = false; // Variável de estado para indicar se o transporte é favorito ou não
+
+  @override
+  void initState() {
+    super.initState();
+    // Verificar se o transporte é favorito ao inicializar a tela
+    _verificarFavorito();
+  }
+
+  void _verificarFavorito() async {
+    // Verificar se o transporte é favorito e atualizar o estado
+    bool isFavorito = await FavoritoService().verificarFavorito(widget.usuario.id as int, widget.transporte.id as int);
+    setState(() {
+      _isFavorito = isFavorito;
+    });
+  }
+
+  void _alternarFavorito() async {
+    setState(() {
+      _isFavorito = !_isFavorito;
+    });
+
+    // Adicionar ou remover o transporte dos favoritos
+    if (_isFavorito) {
+      await FavoritoService().adicionarFavorito(widget.usuario, widget.transporte);
+    } else {
+      await FavoritoService().removerFavorito(widget.usuario.id as int, widget.transporte.id as int);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BarraSuperior(),
-      drawer: MenuDrawer(email: widget.email,),
+      drawer: MenuDrawer(email: widget.usuario.email as String),
       body: FutureBuilder<Transporte>(
-        future: TransporteService().pesquisarTransportePorId(widget.id),
+        future: TransporteService().pesquisarTransportePorId(widget.usuario.id as int),
         builder: (BuildContext context, AsyncSnapshot<Transporte> transporte) {
           if (transporte.hasData) {
             return Container(
@@ -76,18 +110,20 @@ class _PerfilState extends State<Perfil> {
                     children: [
                       Column(
                         children: [
-                          Icon(
-                            Icons.access_time_rounded,
-                            color: Color.fromARGB(255, 220, 183, 0),
-                            size: 28,
+                          IconButton(
+                            icon: Icon(
+                              _isFavorito ? Icons.favorite : Icons.favorite_border,
+                              color: _isFavorito ? Colors.red : Colors.grey,
+                            ),
+                            onPressed: _alternarFavorito,
                           ),
                           SizedBox(
                             height: 10,
                           ),
                           Text(
-                            "Horários",
+                            _isFavorito ? 'Favorito' : 'Não Favorito',
                             style: TextStyle(
-                              color: Color.fromARGB(255, 220, 183, 0),
+                              color: _isFavorito ? Colors.red : Colors.grey,
                               fontSize: 18,
                             ),
                           ),

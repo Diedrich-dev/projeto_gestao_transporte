@@ -39,7 +39,7 @@ class Conexao {
   _onCreate(Database db, int version) async {
         await db.execute(CREATE_USUARIO_TABLE_SCRIPT);
         await db.execute(CREATE_TRANSPORTE_TABLE_SCRIPT);
-        await db.execute($FAVORITO_TABLE_NAME_SCRIPT);
+        await db.execute(CREATE_FAVORITO_TABLE_SCRIPT);
 
         await db.rawInsert('''insert into $USUARIO_TABLE_NAME(
           $USUARIO_COLUMN_NOME,

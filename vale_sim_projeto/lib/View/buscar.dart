@@ -1,13 +1,15 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:vale_sim_projeto/Model/usuario.dart';
 import 'package:vale_sim_projeto/Service/transporteService.dart';
-import 'package:vale_sim_projeto/View/perfil.dart';
+import 'package:vale_sim_projeto/View/perfilTransporte.dart';
 import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
 import '../Model/transporte.dart';
-import 'cadastro.dart';
+import '../Service/usuarioService.dart';
+import 'cadastroTransporte.dart';
 
 class Buscar extends StatefulWidget {
   final String email;
@@ -18,12 +20,28 @@ class Buscar extends StatefulWidget {
 }
 
 class BuscarState extends State<Buscar> {
+  late Usuario usuario;
+
+  @override
+  void initState() {
+    super.initState();
+    carregarUsuario().then((loadedUsuario) {
+      setState(() {
+        usuario = loadedUsuario;
+      });
+    });
+  }
+
+  Future<Usuario> carregarUsuario() async {
+    return await UsuarioService().getUsuarioLogado(widget.email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new BarraSuperior(),
 
-      drawer: new MenuDrawer(email: widget.email,),
+      drawer: new MenuDrawer(email: widget.email),
 
       body: FutureBuilder<List<Transporte>>(
         future: TransporteService().getAllTransporte(),
@@ -99,7 +117,7 @@ class BuscarState extends State<Buscar> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    Perfil(id: transporte.id as int, email: widget.email)));
+                                    PerfilTransporte(usuario: usuario, transporte: transporte)));
                       },
                     ),
                   ),
@@ -120,7 +138,7 @@ class BuscarState extends State<Buscar> {
         onPressed: () {
           //Botão adicionar
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => new Cadastro(email: widget.email)));
+              context, MaterialPageRoute(builder: (context) => new CadastroTransporte(email: widget.email)));
         },
       ),
     );
