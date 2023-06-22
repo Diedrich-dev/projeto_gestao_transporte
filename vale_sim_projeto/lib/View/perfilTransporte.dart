@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vale_sim_projeto/Model/transporte.dart';
 import 'package:vale_sim_projeto/Service/favoritoService.dart';
 import 'package:vale_sim_projeto/Service/transporteService.dart';
+import 'package:vale_sim_projeto/View/editarTransporte.dart';
 import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
@@ -9,9 +10,9 @@ import '../Model/usuario.dart';
 
 class PerfilTransporte extends StatefulWidget {
   final Usuario usuario;
-  final Transporte transporte;
+  Transporte transporte;
 
-  const PerfilTransporte({Key? key, required this.usuario, required this.transporte}) : super(key: key);
+  PerfilTransporte({Key? key, required this.usuario, required this.transporte}) : super(key: key);
 
   @override
   _PerfilTransporteState createState() => _PerfilTransporteState();
@@ -54,7 +55,7 @@ class _PerfilTransporteState extends State<PerfilTransporte> {
       appBar: BarraSuperior(),
       drawer: MenuDrawer(email: widget.usuario.email as String),
       body: FutureBuilder<Transporte>(
-        future: TransporteService().pesquisarTransportePorId(widget.usuario.id as int),
+        future: TransporteService().pesquisarTransportePorId(widget.transporte.id as int),
         builder: (BuildContext context, AsyncSnapshot<Transporte> transporte) {
           if (transporte.hasData) {
             return Container(
@@ -78,7 +79,7 @@ class _PerfilTransporteState extends State<PerfilTransporte> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                        transporte.data?.nome as String,
+                        'Motorista ${transporte.data?.nome as String}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -92,7 +93,7 @@ class _PerfilTransporteState extends State<PerfilTransporte> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        transporte.data?.linha as String,
+                        'Linha: ${transporte.data?.linha as String}',
                         style: TextStyle(
                           fontSize: 18,
                         ),
@@ -147,8 +148,23 @@ class _PerfilTransporteState extends State<PerfilTransporte> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.create_outlined),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditarTransporte(transporte: widget.transporte),
+            ),
+          ).then((editedTransporte) {
+            if (editedTransporte != null) {
+              setState(() {
+                // Atualize a instância do transporte com o transporte atualizado
+                widget.transporte = editedTransporte as Transporte;
+              });
+            }
+          });
+        },
       ),
+
     );
   }
 }

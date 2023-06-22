@@ -17,9 +17,11 @@ class TransporteService {
         $TRANSPORTE_COLUMN_RENAVAM,
         $TRANSPORTE_COLUMN_PLACA,
         $TRANSPORTE_COLUMN_CAPACIDADE,
+        $TRANSPORTE_COLUMN_NUMERO,
+        $TRANSPORTE_COLUMN_FAVORITO,
         $TRANSPORTE_COLUMN_LINHA)
         values(
-          '${transporte.nome}', '${transporte.renavam}', '${transporte.placa}', '${transporte.capacidade}', '${transporte.linha}'
+          '${transporte.nome}', '${transporte.renavam}', '${transporte.placa}', '${transporte.capacidade}', '${transporte.numero}', '${0}','${transporte.linha}'
         )''');
       queryAllRows();
       return true;
@@ -47,6 +49,8 @@ class TransporteService {
       transporte.placa = row['placa'];
       transporte.capacidade = row['capacidade'];
       transporte.linha = row['linha'];
+      transporte.numero = row['numero'];
+      transporte.favorito = row['favorito'] == 1 ? true : false;
       transportes.add(transporte);
     }
     return transportes;
@@ -55,23 +59,28 @@ class TransporteService {
   Future<void> atualizarTransporte(Transporte transporte) async {
     db = await Conexao.instance.getConexaoDB;
     await db.transaction((txn) async {
-      await txn.rawUpdate(
-          'update $TRANSPORTE_TABLE_NAME set $TRANSPORTE_COLUMN_NOME = ?, $TRANSPORTE_COLUMN_RENAVAM = ?, $TRANSPORTE_COLUMN_PLACA = ?,  $TRANSPORTE_COLUMN_CAPACIDADE = ?, $TRANSPORTE_COLUMN_LINHA = ?, where id = ?',
-          [
-            transporte.nome,
-            transporte.renavam,
-            transporte.placa,
-            transporte.capacidade,
-            transporte.linha
-          ]);
+      await txn.update(
+        TRANSPORTE_TABLE_NAME,
+        transporte.toMap(),
+        where: '$TRANSPORTE_COLUMN_ID = ?',
+        whereArgs: [transporte.id],
+      );
     });
   }
 
   Future<void> deleteTransportes(Transporte transporte) async {
     db = await Conexao.instance.getConexaoDB;
+
     await db.transaction((txn) async {
-      await txn.rawUpdate(
-          'DELETE FROM $TRANSPORTE_TABLE_NAME WHERE id = ?', [transporte.id]);
+      await txn.rawDelete(
+          'DELETE FROM $FAVORITO_TABLE_NAME WHERE $FAVORITO_COLUMN_TRANSPORTE_ID = ?',
+          [transporte.id]
+      );
+
+      await txn.rawDelete(
+          'DELETE FROM $TRANSPORTE_TABLE_NAME WHERE $TRANSPORTE_COLUMN_ID = ?',
+          [transporte.id]
+      );
     });
   }
 
@@ -87,6 +96,8 @@ class TransporteService {
       transporte.nome = row['nome'];
       transporte.renavam = row['renavam'];
       transporte.placa = row['placa'];
+      transporte.numero = row['numero'];
+      transporte.favorito = row['favorito'] == 1 ? true : false;
       transporte.capacidade = row['capacidade'];
       transporte.linha = row['linha'];
 
@@ -109,14 +120,16 @@ class TransporteService {
       transporte.id = row['id_transporte'];
       transporte.nome = row['nome'];
       transporte.renavam = row['renavam'];
+      transporte.numero = row['numero'];
       transporte.placa = row['placa'];
+      transporte.favorito = row['favorito'] == 1 ? true : false;
       transporte.capacidade = row['capacidade'];
       transporte.linha = row['linha'];
 
       return transporte;
     } else {
       throw Exception(
-          'Transporte não encontrado'); // Throw an exception to indicate that the transportation was not found
+          'Transporte não encontrado');
     }
   }
 }

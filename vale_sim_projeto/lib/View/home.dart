@@ -36,6 +36,9 @@ class HomeState extends State<Home> {
                     return ElevatedButton(
                         child: Container(
                             width: 300,
+                            decoration: BoxDecoration(
+                              borderRadius:  BorderRadius.circular(10),
+                            ),
                             padding: EdgeInsets.all(16),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,6 +71,9 @@ class HomeState extends State<Home> {
                     return ElevatedButton(
                         child: Container(
                             width: 300,
+                            decoration: BoxDecoration(
+                              borderRadius:  BorderRadius.circular(10),
+                            ),
                             padding: EdgeInsets.all(16),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

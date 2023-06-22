@@ -39,22 +39,16 @@ class BuscarState extends State<Buscar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: new BarraSuperior(),
-
-      drawer: new MenuDrawer(email: widget.email),
-
+      appBar: BarraSuperior(),
+      drawer: MenuDrawer(email: widget.email),
       body: FutureBuilder<List<Transporte>>(
         future: TransporteService().getAllTransporte(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<Transporte>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<Transporte>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Caso esteja aguardando a conclusão do Future, exiba um indicador de progresso
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // Caso ocorra um erro ao obter os dados do Future, exiba uma mensagem de erro
             return Center(child: Text('Ocorreu um erro ao carregar os dados'));
           } else if (!snapshot.hasData || snapshot.data?.isEmpty == true) {
-            // Caso não haja dados disponíveis ou a lista esteja vazia, exiba uma mensagem informando
             return Center(child: Text('Nenhum transporte encontrado'));
           } else {
             return ListView.builder(
@@ -63,62 +57,91 @@ class BuscarState extends State<Buscar> {
               itemCount: snapshot.data?.length,
               itemBuilder: (BuildContext context, int index) {
                 Transporte transporte = snapshot.data![index];
-                return Container(
-                  color: Colors.indigo.shade900,
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.symmetric(
-                    horizontal: 25,
-                    vertical: 5,
-                  ),
-                  child: ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        new ClipRRect(
-                          borderRadius: BorderRadius.circular(50),
-                          // child: Image.asset(
-                          // url imagem,
-                          // width: 60,
-                          // heigth: 60,
-                          // fit: boxFit.cover),
+                return Dismissible(
+                  key: UniqueKey(),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    setState(() {
+                      snapshot.data!.removeAt(index);
+                    });
+                    TransporteService().deleteTransportes(transporte);
+                  },
+                  background: Container(
+                    color: Colors.red,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 16.0),
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.white,
                         ),
-                        Column(
-                          children: [
-                            Text(
-                              'Motorista: ${transporte.nome as String}',
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 220, 183, 0),
-                                  fontSize: 24),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            new Text(
-                              'linha: ${transporte.linha as String}',
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 220, 183, 0),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.arrow_right,
-                        color: Color.fromARGB(255, 220, 183, 0),
-                        size: 32,
                       ),
-                      onPressed: () {
-                        Navigator.push(
+                    ),
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.indigo.shade900,
+                    ),
+                    margin: EdgeInsets.symmetric(
+                      horizontal: 25,
+                      vertical: 5,
+                    ),
+                    child: ListTile(
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            // child: Image.asset(
+                            //   // 'url imagem', // Substitua 'url imagem' pela URL real da imagem
+                            //   width: 60,
+                            //   height: 60,
+                            //   fit: BoxFit.cover,
+                            // ),
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                'Motorista: ${transporte.nome as String}',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 220, 183, 0),
+                                  fontSize: 24,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                'linha: ${transporte.linha as String}',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 220, 183, 0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(
+                          Icons.arrow_right,
+                          color: Color.fromARGB(255, 220, 183, 0),
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    PerfilTransporte(usuario: usuario, transporte: transporte)));
-                      },
+                              builder: (context) => PerfilTransporte(usuario: usuario, transporte: transporte),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 );
@@ -127,8 +150,6 @@ class BuscarState extends State<Buscar> {
           }
         },
       ),
-
-      //Botão flututante
       floatingActionButton: FloatingActionButton(
         child: Icon(
           Icons.add,
@@ -136,9 +157,10 @@ class BuscarState extends State<Buscar> {
           size: 32,
         ),
         onPressed: () {
-          //Botão adicionar
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => new CadastroTransporte(email: widget.email)));
+            context,
+            MaterialPageRoute(builder: (context) => CadastroTransporte(email: widget.email)),
+          );
         },
       ),
     );

@@ -16,12 +16,12 @@ class Conexao {
   static Database? _database;
 
   get getConexaoDB async {
-    // Obter o caminho do banco de dados
-    String databasePath = await getDatabasesPath();
-    String path = join(databasePath, DATABASE_VALESIM);
-
-    // Apagar o banco de dados, se existir
-    await deleteDatabase(path);
+    // // Obter o caminho do banco de dados
+    // String databasePath = await getDatabasesPath();
+    // String path = join(databasePath, DATABASE_VALESIM);
+    //
+    // // Apagar o banco de dados, se existir
+    // await deleteDatabase(path);
 
     // Inicializar o banco de dados
     if (_database != null) return _database;

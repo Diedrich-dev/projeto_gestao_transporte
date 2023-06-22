@@ -23,15 +23,27 @@ class Transporte {
 
   factory Transporte.fromMap(Map<String, dynamic> map) {
     return Transporte(
-      id: map['id_transporte'],
-      nome: map['nome'],
-      numero: map['numero'],
-      renavam: map['renavam'],
-      placa: map['placa'],
-      capacidade: map['capacidade'],
-      linha: map['linha'],
-      favorito: map['favorito'] == 1,
-      foto: map['foto'],
+      id: map['id_transporte'] as int,
+      nome: map['nome'] as String,
+      numero: map['numero'] as String,
+      renavam: map['renavam'] as String,
+      placa: map['placa'] as String,
+      capacidade: map['capacidade'] as String,
+      linha: map['linha'] as String,
+      favorito: map['favorito'] == 1 ? true : false,
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id_transporte': id,
+      'nome': nome,
+      'numero': numero,
+      'renavam': renavam,
+      'placa': placa,
+      'capacidade': capacidade,
+      'linha': linha,
+      'favorito': favorito == true ? 1 : 0,
+    };
   }
 }

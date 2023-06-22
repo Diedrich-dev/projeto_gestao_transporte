@@ -18,7 +18,7 @@ class UsuarioService {
         $USUARIO_COLUMN_NOME,
         $USUARIO_COLUMN_SOBRENOME,
         $USUARIO_COLUMN_EMAIL,
-        $USUARIO_COLUMN_SENHA
+        $USUARIO_COLUMN_SENHA)
         values(
           '${usuario.nome}', '${usuario.sobrenome}', '${usuario.email}', '${usuario.senha}'
         )''');
@@ -50,15 +50,6 @@ class UsuarioService {
     }
     return usuarios;
   }
-
-  // Future<void> atualizarUsuario(Usuario usuario) async {
-  //   db = await Conexao.instance.getConexaoDB;
-  //   await db.transaction((txn) async {
-  //     await txn.rawUpdate(
-  //         'update $USUARIO_TABLE_NAME set $USUARIO_COLUMN_NOME = ?, $USUARIO_COLUMN_SOBRENOME = ?, $USUARIO_COLUMN_EMAIL = ?, $USUARIO_COLUMN_SENHA = ?, where id = ?',
-  //         [usuario.nome, usuario.sobrenome, usuario.email, usuario.senha]);
-  //   });
-  // }
 
   Future<void> atualizarUsuario(Usuario usuario) async {
     db = await Conexao.instance.getConexaoDB;
@@ -132,11 +123,7 @@ class UsuarioService {
 
       if (usuario.id != null) {
         // Busca os transportes favoritos do usuário
-        List<Transporte> dbTransportesFavoritosResult = await FavoritoService().getTransportesFavoritos(usuario.id as int);
-
-        // Converte os resultados em objetos Transporte e atribui ao usuário
-        usuario.transportesFavoritos =
-            dbTransportesFavoritosResult.map((row) => Transporte.fromMap(row as Map<String, dynamic>)).toList();
+        usuario.transportesFavoritos = await FavoritoService().getTransportesFavoritos(usuario.id as int);
       }
       return usuario;
     } else {

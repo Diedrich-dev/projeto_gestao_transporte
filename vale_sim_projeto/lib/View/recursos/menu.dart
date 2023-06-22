@@ -93,7 +93,7 @@ class _MenuDrawerState extends State<MenuDrawer> {
                   title: mostrarTitulo("Transportes"),
                   subtitle: Text("Lista de transportes cadastrados"),
                   trailing: Icon(Icons.arrow_right),
-                  leading: formatarIconDrawer(Icons.star),
+                  leading: formatarIconDrawer(Icons.directions_bus),
                   onTap: () {
                     Navigator.push(
                       context,

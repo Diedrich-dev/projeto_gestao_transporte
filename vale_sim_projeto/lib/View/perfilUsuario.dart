@@ -4,6 +4,7 @@ import 'package:vale_sim_projeto/Model/usuario.dart';
 import 'package:vale_sim_projeto/Service/favoritoService.dart';
 import 'package:vale_sim_projeto/Service/usuarioService.dart';
 import 'package:vale_sim_projeto/View/editarUsuario.dart';
+import 'package:vale_sim_projeto/View/perfilTransporte.dart';
 import 'package:vale_sim_projeto/View/recursos/barraSuperior.dart';
 import 'package:vale_sim_projeto/View/recursos/menu.dart';
 
@@ -124,24 +125,44 @@ class _PerfilUsuarioState extends State<PerfilUsuario> {
                               itemCount: transportesFavoritos.length,
                               itemBuilder: (context, index) {
                                 Transporte transporte = transportesFavoritos[index];
-                                return ListTile(
-                                  title: Text(transporte.nome!),
-                                  subtitle: Text(transporte.linha!),
-                                  trailing: IconButton(
-                                    icon: Icon(
-                                      transporte.favorito ? Icons.favorite : Icons.favorite_border,
-                                      color: Colors.red,
+                                return GestureDetector(
+                                  onTap: () {
+                                    // Navegar para a tela de perfil do transporte
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PerfilTransporte(usuario: usuario, transporte: transporte),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.indigo.shade900,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        transporte.favorito = !transporte.favorito;
-                                      });
-                                      if (transporte.favorito) {
-                                        FavoritoService().adicionarFavorito(usuario, transporte);
-                                      } else {
-                                        FavoritoService().removerFavorito(usuario.id as int, transporte.id as int);
-                                      }
-                                    },
+                                    child: ListTile(
+                                      title: Text(transporte.nome!, style: TextStyle(fontWeight: FontWeight.bold),),
+                                      subtitle: Text(transporte.linha!),
+                                      textColor: Color.fromARGB(255, 220, 183, 0),
+                                      trailing: IconButton(
+                                        icon: Icon(
+                                          transporte.favorito ? Icons.favorite : Icons.favorite_border,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () async {
+                                          setState(() {
+                                            transporte.favorito = !transporte.favorito;
+                                          });
+
+                                          if (!transporte.favorito) {
+                                            await FavoritoService().adicionarFavorito(usuario, transporte);
+                                          } else {
+                                            await FavoritoService().removerFavorito(usuario.id as int, transporte.id as int);
+                                          }
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 );
                               },
@@ -162,8 +183,17 @@ class _PerfilUsuarioState extends State<PerfilUsuario> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => EditarUsuario(usuario: usuario)),
-          );
+            MaterialPageRoute(
+              builder: (context) => EditarUsuario(usuario: usuario),
+            ),
+          ).then((editedUsuario) {
+            if (editedUsuario != null) {
+              setState(() {
+                // Atualize a instância do transporte com o transporte atualizado
+                usuario = editedUsuario;
+              });
+            }
+          });
         },
       ),
     );

@@ -53,17 +53,15 @@ class _EditarUsuarioState extends State<EditarUsuario> {
     UsuarioService usuarioService = UsuarioService();
     await usuarioService.atualizarUsuario(usuarioAtualizado);
 
-    // Atualize a instância do usuário na tela anterior, se necessário
-    // Exemplo: widget.usuario = usuarioAtualizado;
-
-    Navigator.pop(context);
+    Navigator.pop(context, usuarioAtualizado);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar Usuário'),
+        backgroundColor: Colors.indigo.shade900,
+        title: Text('Editar Usuário', style: TextStyle(color: Color.fromARGB(255, 220, 183, 0),)),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -87,6 +85,9 @@ class _EditarUsuarioState extends State<EditarUsuario> {
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.indigo.shade900),
+              ),
               onPressed: _salvarEdicao,
               child: Text('Salvar'),
             ),

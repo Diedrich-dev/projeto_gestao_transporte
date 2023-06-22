@@ -62,6 +62,7 @@ class CadastroTransporteState extends State<CadastroTransporte> {
 
               campoInput("motorista", nomeController),
               campoInput("número", numeroController),
+              campoInput("capacidade", capacidadeController),
               campoInput("linha", linhaController),
               campoInput("placa", placaController),
               campoInput("renavam", renavamController),

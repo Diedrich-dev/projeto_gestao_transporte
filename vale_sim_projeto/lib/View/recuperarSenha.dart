@@ -68,7 +68,7 @@ class RecuperarSenhaState extends State<RecuperarSenha> {
                     builder: (BuildContext context) {
                       return ElevatedButton(
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
 
                           child: Text(
                             "Recuperar",
@@ -94,7 +94,7 @@ class RecuperarSenhaState extends State<RecuperarSenha> {
                     builder: (BuildContext context) {
                       return ElevatedButton(
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
 
                           child: Text(
                             "Limpar",
